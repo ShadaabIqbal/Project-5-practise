@@ -32,6 +32,7 @@ const createUser = async function (req, res) {
 
     try {
         let data = req.body;
+        let {password} = data;
         let files = req.files;
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ status: "false", message: "All fields are mandatory" });
@@ -40,17 +41,9 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, message: "Profile pic is mandatory" })
         }
 
-        let password = data.password;
-
-        bcrypt.genSalt(10, function (err, salt) {
-            bcrypt.hash(password, salt, function (err, hash) {
-                if (err) {
-                    return err;
-                } else {
-                    password = hash;
-                }
-            });
-        });
+        let saltRounds = await bcrypt.genSalt(10);
+        let hash = await bcrypt.hash(password, saltRounds);
+        data.password = hash;
 
         let image = await uploadFile(files[0]);
         data.profileImage = image;
