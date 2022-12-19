@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/KLChakraborty/Project-5-Products-Management#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "express": "^4.18.2",
-    "mongoose": "^6.8.0"
+    "mongoose": "^6.8.0",
+    "multer": "^1.4.5-lts.1"
   }
 }
