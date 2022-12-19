@@ -85,7 +85,7 @@ const loginUser = async function (req, res) {
 const getuser = async function(req, res){
     try{
           let userId = req.params.userId;
-          let userLoggedIn =req.token.userId
+          let userLoggedIn =req.decodedToken.userId
           if(userId != userLoggedIn){
             return res.status(403).send({status:false, msg:"Authorization failed"})
           }
