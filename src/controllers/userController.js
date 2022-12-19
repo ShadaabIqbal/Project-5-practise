@@ -1,6 +1,7 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const aws = require('aws-sdk')
+const jwt = require('jsonwebtoken')
 
 aws.config.update({
     accessKeyId: "AKIAY3L35MCRZNIRGT6N",
@@ -56,4 +57,29 @@ const createUser = async function (req, res) {
     }
 }
 
-module.exports = { createUser }
+
+const loginUser = async function(req, res){
+try{
+const { email, password } = req.body
+if(!Object.keys(req.body).length > 0) return res.status(400).send({status: false, message: 'Input is required'})
+
+if(!email) return res.status(400).send({status: false, message: 'Email is required'})
+
+if(!password) return res.status(400).send({status: false, message: 'Password is required'})
+
+let presentUser = await userModel.findOne({ email, password })
+if(!presentUser) return res.status(401).send({status: false, message: 'Invalid email or password'})
+
+let comparePassword = await bcrypt.compare(password, presentUser.password)
+if(!comparePassword) return res.status(401).send({status: false, message: 'Incorrect password'})
+
+const encodeToken = jwt.sign({userId: presentUser._id, iat: Math.floor(Date.now()/1000), exp: Math.floor(Date.now()/1000)+ 60*60*24}, 'group29')
+let obj = {userId: presentUser._id, token: encodeToken}
+return res.status(200).send({status: true, data: obj})
+
+}catch(error){
+    res.status(500).send({ status: false, message: error.message })
+}
+}
+
+module.exports = { createUser, loginUser }
