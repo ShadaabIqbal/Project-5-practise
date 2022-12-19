@@ -5,11 +5,11 @@ const authentication = async function(req, res){
 const token = req.authorisation["Bearer token"]
 if(!token)  return res.status(401).send({status: false, message: 'Token is not present'})
 
-let decodedToken = jwt.verify(token, 'group29', function(error, decodedToken){
-    if(error && err.message === 'jwt expired') return res.status(401).send({status: false, message: 'JWT is expired'})
-    if(err) return res.status(401).send({status: false, message: error.message})
-    if(decodedToken){
-        req.decodedToken = decodedToken
+jwt.verify(token, 'group29', function(error, decodedToken){
+    if(error && error.message === 'jwt expired') return res.status(401).send({status: false, message: 'JWT is expired'})
+    if(error) return res.status(401).send({status: false, message: error.message})
+        else{
+            req.decodedToken = decodedToken
         next()
     }
 })
