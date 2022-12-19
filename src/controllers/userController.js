@@ -33,7 +33,7 @@ const createUser = async function (req, res) {
 
     try {
         let data = req.body;
-        let {password} = data;
+        let { password } = data;
         let files = req.files;
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ status: "false", message: "All fields are mandatory" });
@@ -58,28 +58,28 @@ const createUser = async function (req, res) {
 }
 
 
-const loginUser = async function(req, res){
-try{
-const { email, password } = req.body
-if(!Object.keys(req.body).length > 0) return res.status(400).send({status: false, message: 'Input is required'})
+const loginUser = async function (req, res) {
+    try {
+        const { email, password } = req.body
+        if (!Object.keys(req.body).length > 0) return res.status(400).send({ status: false, message: 'Input is required' })
 
-if(!email) return res.status(400).send({status: false, message: 'Email is required'})
+        if (!email) return res.status(400).send({ status: false, message: 'Email is required' })
 
-if(!password) return res.status(400).send({status: false, message: 'Password is required'})
+        if (!password) return res.status(400).send({ status: false, message: 'Password is required' })
 
-let presentUser = await userModel.findOne({ email, password })
-if(!presentUser) return res.status(401).send({status: false, message: 'Invalid email or password'})
+        let presentUser = await userModel.findOne({ email })
+        if (!presentUser) return res.status(401).send({ status: false, message: 'Invalid email' })
+        
+        let comparePassword = await bcrypt.compare(password, presentUser.password)
+        if (!comparePassword) return res.status(401).send({ status: false, message: 'Incorrect password' })
+       
+        const encodeToken = jwt.sign({ userId: presentUser._id, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 60 }, 'group29')
+        let obj = { userId: presentUser._id, token: encodeToken }
+        return res.status(200).send({ status: true, data: obj })
 
-let comparePassword = await bcrypt.compare(password, presentUser.password)
-if(!comparePassword) return res.status(401).send({status: false, message: 'Incorrect password'})
-
-const encodeToken = jwt.sign({userId: presentUser._id, iat: Math.floor(Date.now()/1000), exp: Math.floor(Date.now()/1000)+ 60*60*24}, 'group29')
-let obj = {userId: presentUser._id, token: encodeToken}
-return res.status(200).send({status: true, data: obj})
-
-}catch(error){
-    res.status(500).send({ status: false, message: error.message })
-}
+    } catch (error) {
+        res.status(500).send({ status: false, message: error.message })
+    }
 }
 
 module.exports = { createUser, loginUser }
