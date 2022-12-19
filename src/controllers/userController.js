@@ -82,4 +82,23 @@ const loginUser = async function (req, res) {
     }
 }
 
-module.exports = { createUser, loginUser }
+const getuser = async function(req, res){
+    try{
+          let userId = req.params.userId;
+          let userLoggedIn =req.token.userId
+          if(userId != userLoggedIn){
+            return res.status(403).send({status:false, msg:"Authorization failed"})
+          }
+            let correctdata= await userModel.findById({_id: userId});
+            if(!correctdata){
+                return res.status(404).send({status:false, message:"No data found"})
+            }
+            return res.status(200).json({status:true, message: "User profile details", data: correctdata})
+          
+    }catch(err){
+        return res.status(500).json({status:false, message:err.message})
+    }
+}
+
+
+module.exports = { createUser, loginUser, getuser }
