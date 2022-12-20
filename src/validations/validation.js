@@ -53,4 +53,12 @@ function isJson(str) {
     return obj;
 }
 
-module.exports = { isEmpty, isValidName, isValidPhone, isValidpincode, isValidStreet, isValidEmail, isValidPswd, isJson }
+const validSize = function (value){
+    return ["S", "XS","M","X", "L","XXL", "XL"].includes(value)
+}
+
+const validImage = function (value){
+    return value.match(/(\.jpg|\.jpeg|\.bmp|\.gif|\.png)$/)
+}
+
+module.exports = { isEmpty, isValidName, isValidPhone, isValidpincode, isValidStreet, isValidEmail, isValidPswd, isJson, validSize, validImage }

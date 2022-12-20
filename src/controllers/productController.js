@@ -1,6 +1,8 @@
-let productModel = require('..productModel/models/')
+let productModel = require('..productModel/models/');
+const validation = require('../validations/validation');
+const aws = require('../aws/aws')
 
-let isValidImage = /.*\.([gG][iI][fF]|[jJ][pP][gG]|[jJ][pP][eE][gG]|[bB][mM][pP])$/
+
 
 module.exports.createProduct = async function (req, res) {
     try {
@@ -33,7 +35,7 @@ module.exports.createProduct = async function (req, res) {
       if (!availableSizes)return res.status(400).send({ status: false, message: "availableSizes is required" });
   
 
-      if(!["S", "XS","M","X", "L","XXL", "XL"].include(availableSizes)) return res.status(400).send({status:false, message:"Size not avilable"})
+      if(!validation.validSize(availableSizes)) return res.status(400).send({status:false, message:"Size not avilable"})
 
       const isTitleAlreadyUsed = await productModel.findOne({
         title: req.body.title,
@@ -47,10 +49,10 @@ module.exports.createProduct = async function (req, res) {
       let uploadedFileURL;
   
       if (req.files && req.files.length > 0) {
-        if (!isValidImage(files[0].originalname))
+        if (!validation.validImage(files[0].originalname))
           return res.status(400).send({ status: false, message: "productImage must be of extention .jpg,.jpeg,.bmp,.gif,.png" });
   
-        uploadedFileURL = await uploadFile(req.files[0]);
+        uploadedFileURL = await aws.uploadFile(req.files[0]);
       } else {
         res.status(400).send({ message: "No file found" });
       }
