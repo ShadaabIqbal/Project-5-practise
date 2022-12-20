@@ -17,8 +17,8 @@ const productSchema = new mongoose.Schema({
     price: {
 
         type: Number,
-        required: true,
-        trim: true,
+        required: true
+        
     },
 
     currencyId: {
@@ -60,17 +60,18 @@ const productSchema = new mongoose.Schema({
 
 
     installments: {
-        type: Number,
-        trim: true,
+        type: Number
+        
     },
 
     deletedAt: {
         type: Date,
+        default:null
     },
 
     isDeleted: {
         type: Boolean,
-        default: false,
+        default: false
     },
 },
     { timestamps: true }
