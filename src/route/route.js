@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/userController')
 const productController = require('../controllers/productController')
+const cartController = require('../controllers/cartController')
 const auth = require('../middleware/auth')
 
 router.post('/register', userController.createUser )
@@ -17,6 +18,10 @@ router.post('/products', productController.createProduct )
 router.get('/products', productController.getProductByQuery )
 
 router.get('/products/:productId', productController.getProductById )
+
+router.put('/products/:productId', productController.updateProduct )
+
+router.post('/users/:userId/cart', cartController.createCart )
 
 
 

@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const requiredInput = function (value){
     return Object.keys(value).length > 0
 }
@@ -67,4 +69,12 @@ const validImage = function (value){
     return value.match(/(\.jpg|\.jpeg|\.bmp|\.gif|\.png)$/)
 }
 
-module.exports = { isEmpty, isValidName, isValidPhone, isValidpincode, isValidStreet, isValidEmail, isValidPswd, isJson, validSize, validImage, requiredInput }
+const isValidPrice = function (price) {
+    return /^[1-9]\d{0,7}(?:\.\d{1,2})?$/.test(price);
+  };
+
+  const isValidObjectId = (objectId) => {
+    return mongoose.Types.ObjectId.isValid(objectId);
+};
+
+module.exports = { isEmpty, isValidName, isValidPhone, isValidpincode, isValidStreet, isValidEmail, isValidPswd, isJson, validSize, validImage, requiredInput, isValidPrice, isValidObjectId }
