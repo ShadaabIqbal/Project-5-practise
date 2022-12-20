@@ -86,13 +86,9 @@ const createUser = async function (req, res) {
         let hash = await bcrypt.hash(password, saltRounds);
         data.password = hash;
 
-        let checkEmail = await userModel.findOne({ email });
-        if (checkEmail) {
-            return res.status(400).send({ status: "false", message: "Email is already exists" });
-        }
-        let checkPhone = await userModel.findOne({ phone });
-        if (checkPhone) {
-            return res.status(400).send({ status: "false", message: "Phone number is already exists" });
+        let checkEmailAndPhone = await userModel.findOne({ $or: [ {email }, { phone }] });
+        if (checkEmailAndPhone) {
+            return res.status(400).send({ status: "false", message: "Email or phone already exists" });
         }
 
         let PicUrl = await uploadFile(files[0])
@@ -126,7 +122,7 @@ const loginUser = async function (req, res) {
         let comparePassword = await bcrypt.compare(password, presentUser.password)
         if (!comparePassword) return res.status(401).send({ status: false, message: 'Incorrect password' })
 
-        const encodeToken = jwt.sign({ userId: presentUser._id, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60 }, 'group29')
+        const encodeToken = jwt.sign({ userId: presentUser._id, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + (60*60*24) }, 'group29')
         let obj = { userId: presentUser._id, token: encodeToken }
         return res.status(200).send({ status: true, data: obj })
 
@@ -138,7 +134,7 @@ const loginUser = async function (req, res) {
 const getuser = async function (req, res) {
     try {
         let userId = req.params.userId;
-        let userLoggedIn = req.tokenData.userId
+        let userLoggedIn = req.decodedToken.userId
         if (userId != userLoggedIn) {
             return res.status(403).send({ status: false, msg: "Authorization failed" })
         }
@@ -156,7 +152,7 @@ const getuser = async function (req, res) {
 const updateUser = async function (req, res) {
     try {
         let userId = req.params.userId;
-        let userLoggedIn = req.tokenData.userId;
+        let userLoggedIn = req.decodedToken.userId;
 
         if (!isValidObjectId(userId)) {
             return res.status(400).send({ status: false, message: "userid is invalid" });
