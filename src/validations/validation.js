@@ -1,3 +1,9 @@
+const requiredInput = function (value){
+    return Object.keys(value).length > 0
+}
+
+
+
 // Validation for empty
 const isEmpty = function (value) {
     if (typeof value === "undefined" || value === null) return false;
@@ -61,4 +67,4 @@ const validImage = function (value){
     return value.match(/(\.jpg|\.jpeg|\.bmp|\.gif|\.png)$/)
 }
 
-module.exports = { isEmpty, isValidName, isValidPhone, isValidpincode, isValidStreet, isValidEmail, isValidPswd, isJson, validSize, validImage }
+module.exports = { isEmpty, isValidName, isValidPhone, isValidpincode, isValidStreet, isValidEmail, isValidPswd, isJson, validSize, validImage, requiredInput }

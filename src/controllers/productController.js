@@ -4,7 +4,7 @@ const aws = require('../aws/aws')
 
 
 
-module.exports.createProduct = async function (req, res) {
+exports.createProduct = async function (req, res) {
     try {
       let data = req.body;
   
@@ -65,3 +65,42 @@ module.exports.createProduct = async function (req, res) {
       return res.status(500).send({ status: false, error: error.message });
     }
   };
+
+
+exports.getProduct = async function(req, res){
+try{
+if(!validation.requiredInput(req.query)) return res.status(400).send({ status: false, message: "Input is required" })
+const { size, name, priceGreaterThan, priceLessThan, priceSort } = req.query
+
+let obj = { isDeleted: false}
+
+if(size){
+  obj.availableSizes = size
+}
+if(name){
+  obj.title = name
+}
+if(priceGreaterThan){
+  obj.price = {$gt: priceGreaterThan}
+}
+if(priceLessThan){
+  obj.price = {$lt: priceLessThan}
+}
+if(priceSort != -1 || 1 ) return res.status(400).send({ status: false, message: "Price sort can only be 1 or -1" })
+
+let allProduct = await productModel.find({obj})
+if(!allProduct.length > 0) return res.status(404).send({ status: false, message: "Product not found" })
+
+if(priceSort == 1){
+let x  = allProduct.sort((a, b) => {return a.price - b.price})
+return res.status(200).send({ status: true, data: x })
+}
+if(priceSort == -1){
+ let y =  allProduct.sort((a, b) => {return b.price - a.price})
+ return res.status(200).send({ status: true, data: y })
+}
+
+}catch(error){
+  return res.status(500).send({ status: false, error: error.message });
+}
+}
