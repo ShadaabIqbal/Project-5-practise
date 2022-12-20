@@ -1,6 +1,7 @@
 let productModel = require('..productModel/models/');
 const validation = require('../validations/validation');
-const aws = require('../aws/aws')
+const aws = require('../aws/aws');
+const userModel = require('../models/userModel');
 
 
 
@@ -86,10 +87,10 @@ if(priceGreaterThan){
 if(priceLessThan){
   obj.price = {$lt: priceLessThan}
 }
-if(priceSort != -1 || 1 ) return res.status(400).send({ status: false, message: "Price sort can only be 1 or -1" })
-
 let allProduct = await productModel.find({obj})
 if(!allProduct.length > 0) return res.status(404).send({ status: false, message: "Product not found" })
+
+if(priceSort != -1 || priceSort != 1 ) return res.status(400).send({ status: false, message: "Price sort can only be 1 or -1" })
 
 if(priceSort == 1){
 let x  = allProduct.sort((a, b) => {return a.price - b.price})
@@ -106,4 +107,18 @@ if(priceSort == -1){
 }
 
 
-module.exports = { createProduct, getProduct }
+const getProductById = async function(req, res){
+  try{
+const productId = req.params._id
+
+const getProduct = await userModel.findById({isDeleted: false, _id: productId})
+if(!getProduct) return res.status(404).send({ status: false, message: 'Product not found' })
+return res.status(200).send({status: true, data: getProduct})
+
+
+  }catch(error){
+    return res.status(500).send({ status: false, error: error.message });
+  }
+}
+
+module.exports = { createProduct, getProduct, getProductById }
