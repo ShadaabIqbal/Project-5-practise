@@ -1,4 +1,4 @@
-let productModel = require('..productModel/models/');
+let productModel = require('../models/productModel');
 const validation = require('../validations/validation');
 const aws = require('../aws/aws');
 const userModel = require('../models/userModel');
@@ -46,6 +46,8 @@ const createProduct = async function (req, res) {
         return res.status(404).send({ status: false, message: "Title is already used" });
   
       if (currencyId != 'INR')return res.status(400).send({ status: false, message: "currencyId must be INR " })
+
+      if (currencyFormat != '₹')return res.status(400).send({ status: false, message: "currencyFormat must be ₹ " })
   
       let uploadedFileURL;
   
@@ -67,43 +69,36 @@ const createProduct = async function (req, res) {
     }
   };
 
+const getProductByQuery = async function (req, res) {
+  try {
+    if (!validation.requiredInput(req.query)) return res.status(400).send({ status: false, message: "Input is required" })
+    const { size, name, priceGreaterThan, priceLessThan, priceSort } = req.query
 
-const getProduct = async function(req, res){
-try{
-if(!validation.requiredInput(req.query)) return res.status(400).send({ status: false, message: "Input is required" })
-const { size, name, priceGreaterThan, priceLessThan, priceSort } = req.query
+    let obj = { isDeleted: false }
 
-let obj = { isDeleted: false}
+    if (size) {
+      obj.availableSizes = size
+    }
+    if (name) {
+      obj.title = name
+    }
+    if (priceGreaterThan) {
+      obj.price = { $gt: priceGreaterThan }
+    }
+    if (priceLessThan) {
+      obj.price = { $lt: priceLessThan }
+    }
+    if (priceSort) {
+      if (!(priceSort == -1 || priceSort == 1)) return res.status(400).send({ status: false, message: "Price sort can only be 1 or -1" })
+    }
 
-if(size){
-  obj.availableSizes = size
-}
-if(name){
-  obj.title = name
-}
-if(priceGreaterThan){
-  obj.price = {$gt: priceGreaterThan}
-}
-if(priceLessThan){
-  obj.price = {$lt: priceLessThan}
-}
-let allProduct = await productModel.find({obj})
-if(!allProduct.length > 0) return res.status(404).send({ status: false, message: "Product not found" })
+    let allProduct = await productModel.find(obj).sort({price: priceSort})
+    if (!allProduct.length > 0) return res.status(404).send({ status: false, message: "Product not found" })
+    return res.status(200).send({status: true, data: allProduct})
 
-if(priceSort != -1 || priceSort != 1 ) return res.status(400).send({ status: false, message: "Price sort can only be 1 or -1" })
-
-if(priceSort == 1){
-let x  = allProduct.sort((a, b) => {return a.price - b.price})
-return res.status(200).send({ status: true, data: x })
-}
-if(priceSort == -1){
- let y =  allProduct.sort((a, b) => {return b.price - a.price})
- return res.status(200).send({ status: true, data: y })
-}
-
-}catch(error){
-  return res.status(500).send({ status: false, error: error.message });
-}
+  } catch (error) {
+    return res.status(500).send({ status: false, error: error.message });
+  }
 }
 
 
@@ -121,4 +116,4 @@ return res.status(200).send({status: true, data: getProduct})
   }
 }
 
-module.exports = { createProduct, getProduct, getProductById }
+module.exports = { createProduct, getProductByQuery, getProductById }
