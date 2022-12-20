@@ -9,4 +9,6 @@ router.post('/login', userController.loginUser )
 
 router.get('/user/:userId/profile', auth.authentication, userController.getuser )
 
+router.put('/user/:userId/profile', auth.authentication, userController.updateUser )
+
 module.exports = router
