@@ -4,7 +4,7 @@ const aws = require('../aws/aws')
 
 
 
-exports.createProduct = async function (req, res) {
+const createProduct = async function (req, res) {
     try {
       let data = req.body;
   
@@ -67,7 +67,7 @@ exports.createProduct = async function (req, res) {
   };
 
 
-exports.getProduct = async function(req, res){
+const getProduct = async function(req, res){
 try{
 if(!validation.requiredInput(req.query)) return res.status(400).send({ status: false, message: "Input is required" })
 const { size, name, priceGreaterThan, priceLessThan, priceSort } = req.query
@@ -104,3 +104,6 @@ if(priceSort == -1){
   return res.status(500).send({ status: false, error: error.message });
 }
 }
+
+
+module.exports = { createProduct, getProduct }
