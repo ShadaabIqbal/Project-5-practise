@@ -21,7 +21,9 @@ router.get('/products/:productId', productController.getProductById )
 
 router.put('/products/:productId', productController.updateProduct )
 
-router.post('/users/:userId/cart', cartController.createCart )
+router.post('/users/:userId/cart', auth.authentication, cartController.createCart )
+
+router.put('/users/:userId/cart', auth.authentication, cartController.updateCart )
 
 
 
